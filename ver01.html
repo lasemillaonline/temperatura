@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>🌡️ Registro de Temperatura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f9ff;
+            padding: 40px;
+            text-align: center;
+        }
+        h1 {
+            color: #0077b6;
+        }
+        #datos {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            text-align: left;
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            font-family: monospace;
+        }
+        .actualizando {
+            margin-top: 10px;
+            color: #555;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📖 Registro de Temperatura</h1>
+    <div id="datos">Cargando datos...</div>
+    <div class="actualizando">🔁 Actualizando cada 10 segundos...</div>
+
+    <script>
+        function cargarDatos() {
+            const host = window.location.hostname;
+            const puerto = window.location.port;
+            const url = `http://${host}:${puerto}/datos_temperatura.txt`;
+
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error("Archivo no encontrado");
+                    return res.text();
+                })
+                .then(data => {
+                    document.getElementById("datos").textContent = data;
+                })
+                .catch(err => {
+                    document.getElementById("datos").textContent = "❌ Error al cargar datos: " + err;
+                });
+        }
+
+        // Cargar al inicio
+        cargarDatos();
+
+        // Actualizar cada 10 segundos
+        setInterval(cargarDatos, 10000);
+    </script>
+</body>
+</html>

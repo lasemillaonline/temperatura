@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>🌡️ WebControl-IA: Monitor Global de Temperatura</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f3;
+      margin: 20px;
+      padding: 0;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #34495e;
+      margin-bottom: 20px;
+    }
+
+    .tabla-container {
+      max-height: 300px;
+      overflow-y: auto;
+      background-color: #fff;
+      padding: 10px;
+      margin-bottom: 30px;
+      border: 1px solid #ccc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #3498db;
+      color: white;
+      position: sticky;
+      top: 0;
+    }
+
+    .grafico-container {
+      width: 100%;
+      max-width: 900px;
+      margin: auto;
+      background-color: #fff;
+      padding: 20px;
+      border: 1px solid #ccc;
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #555;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌡️ Sistema Global de Control de Temperatura</h1>
+  <h2>📊 Visualización en Tiempo Real</h2>
+
+  <!-- Tabla de temperaturas -->
+  <div class="tabla-container">
+    <table id="tablaTemperaturas">
+      <thead>
+        <tr>
+          <th>Fecha y Hora (Argentina)</th>
+          <th>Temperatura (°C)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Filas se cargarán con JavaScript -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Gráfico de temperaturas -->
+  <div class="grafico-container">
+    <canvas id="graficoTemperatura" height="100"></canvas>
+  </div>
+
+  <footer>
+    La Semilla On Line – Prof. Ing. Víctor Schnidrig
+  </footer>
+
+  <script>
+    fetch('datos_temperatura.txt')
+      .then(res => res.text())
+      .then(data => {
+        const lineas = data.trim().split('\n').reverse(); // Último dato arriba
+        const fechas = [];
+        const temperaturas = [];
+        const tbody = document.querySelector("#tablaTemperaturas tbody");
+
+        lineas.forEach(linea => {
+          const [fechaHora, temp] = linea.split(' - ');
+          const temperatura = parseFloat(temp);
+
+          // Tabla
+          const fila = document.createElement('tr');
+          fila.innerHTML = `<td>${fechaHora}</td><td>${temperatura.toFixed(1)}°</td>`;
+          tbody.appendChild(fila);
+
+          // Datos para gráfico
+          fechas.push(fechaHora);
+          temperaturas.push(temperatura);
+        });
+
+        // Gráfico
+        const ctx = document.getElementById('graficoTemperatura').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: fechas.reverse(),
+            datasets: [{
+              label: 'Temperatura (°C)',
+              data: temperaturas.reverse(),
+              fill: false,
+              borderColor: '#e74c3c',
+              tension: 0.2,
+              pointRadius: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: true },
+              title: {
+                display: true,
+                text: 'Evolución de la Temperatura'
+              }
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Fecha y Hora'
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Temperatura (°C)'
+                }
+              }
+            }
+          }
+        });
+      });
+  </script>
+</body>
+</html>
