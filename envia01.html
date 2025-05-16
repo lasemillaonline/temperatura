@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simulador de Envío de Temperatura</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e6f7ff;
+      padding: 20px;
+    }
+    h1 {
+      color: #0077cc;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+    .status {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Simulador de Envío de Temperatura</h1>
+  <p>Haz clic en el botón para enviar un valor de temperatura simulado al servidor.</p>
+
+  <button onclick="enviarTemperatura()">Enviar Temperatura</button>
+
+  <div id="respuesta" class="status"></div>
+  <div id="ultimoOk" class="status success"></div>
+  <div id="ultimoError" class="status error"></div>
+
+  <script>
+    function enviarTemperatura() {
+      const temperatura = (Math.random() * (40 - 10) + 10).toFixed(1); // Simula entre 10.0°C y 40.0°C
+      const url = "http://186.182.162.88/recibir_datos.php";
+      
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `temperatura=${temperatura}`
+      })
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("respuesta").innerHTML = `✅ Respuesta del servidor: ${data}`;
+        document.getElementById("ultimoOk").innerHTML = `🕓 Último envío correcto: ${new Date().toLocaleString('es-AR')}`;
+        document.getElementById("ultimoError").innerHTML = ""; // Limpia errores anteriores
+      })
+      .catch(error => {
+        document.getElementById("respuesta").innerHTML = `❌ Error al enviar: ${error}`;
+        document.getElementById("ultimoError").innerHTML = `🕓 Último error: ${new Date().toLocaleString('es-AR')}`;
+      });
+    }
+  </script>
+
+</body>
+</html>
